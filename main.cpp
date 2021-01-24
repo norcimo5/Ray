@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cstring>
 #include <unistd.h>
+#if defined(_WIN32)
 #include <windows.h>
+#endif 
 #include "functions.h"
 #define PI 3.14159265358979323846
 using namespace std;
@@ -17,9 +19,23 @@ const int dW=4,dH=8;
 //set cursor at start to avoid flickering
 void gotoxy ( short x, short y )
 {
+#if defined(_WIN32)
 	COORD coord = {x, y};
 	SetConsoleCursorPosition ( GetStdHandle ( STD_OUTPUT_HANDLE ), coord );
+#else
+  printf("\x1b[%d;%dH", y, x);
+  fflush(stdout);
+#endif 
 }
+
+void msleep(int length) {
+#if defined(_WIN32)
+  Sleep(length);
+#else
+  usleep(length * 1000);
+#endif
+}
+
 char palette[]=" .:;~=#OB8%&";
 
 
@@ -177,9 +193,8 @@ int main()
 	}
 	printf("\n");
 	}
-	getchar();
+
 	gotoxy(0,0);
-	
 	
 	while(1)
 	{
@@ -223,7 +238,7 @@ int main()
 		}
 		printf("\n");
 		}
-		
+    msleep(42);
 		//instead of system("cls") i used this because it looks smoother
 		gotoxy(0,0);
 		//update camera position
